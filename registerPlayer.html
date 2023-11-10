@@ -23,15 +23,30 @@
             <a class="nav-link" href="./viewResult.html">戦績照会</a>
             <a class="nav-link active" aria-current="page" href="./registerPlayer.html">雀士登録</a>
         </nav>
+        <div id="alert"></div>
         <div class="input-group mb-3">
             <input type="text" id="player-name" class="form-control" placeholder="名前">
             <button class="btn btn-outline-primary" type="button" onclick="registerplayer()">登録</button>
             <script>
                 function registerplayer() {
+                    $("#alert").empty()
+                    url = "https://vrekzqffoq4atjbf7pj362emnu0rvaro.lambda-url.ap-northeast-1.on.aws/";
                     console.log("hi");
                     // dynamoDBのplayer_tableに追加
                     var playername = $('#player-name').val();
-                    $('#test').append("<p>" + playername + "</p>");
+                    $.ajax({
+                        type: 'POST',
+                        url: url,
+                        data: { PlayerName: playername }
+                    }).done(function (data) {
+                        if (data) {
+                            $("#alert").append("<p>登録成功。</p>");
+                        } else {
+                            $("#alert").append("<p>登録失敗。管理者にご連絡ください。</p>");
+                        }
+                    }).fail(function () {
+                        $("#alert").append("<p>登録失敗。管理者にご連絡ください。</p>");
+                    });
                 }
             </script>
         </div>
