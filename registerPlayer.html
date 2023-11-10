@@ -18,15 +18,24 @@
 <body>
     <div class="m-3">
         <nav class="nav nav-underline nav-fill my-4">
-            <a class="nav-link active" aria-current="page" href="./index.html">ホーム</a>
+            <a class="nav-link" href="./index.html">ホーム</a>
             <a class="nav-link" href="./inputResult.html">戦績入力</a>
             <a class="nav-link" href="./viewResult.html">戦績照会</a>
-            <a class="nav-link" href="./registerPlayer.html">雀士登録</a>
+            <a class="nav-link active" aria-current="page" href="./registerPlayer.html">雀士登録</a>
         </nav>
-        <h1>狂気の沙汰ほど面白い</h1>
-        <div class="mt-5">
-            <img src="img/1m.jpg" width="100%">
+        <div class="input-group mb-3">
+            <input type="text" id="player-name" class="form-control" placeholder="名前">
+            <button class="btn btn-outline-primary" type="button" onclick="registerplayer()">登録</button>
+            <script>
+                function registerplayer() {
+                    console.log("hi");
+                    // dynamoDBのplayer_tableに追加
+                    var playername = $('#player-name').val();
+                    $('#test').append("<p>" + playername + "</p>");
+                }
+            </script>
         </div>
+        <div id="test"></div>
     </div>
 </body>
 

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+
+<head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>麻雀成績簿</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script>
+        $(function () {
+            $("#alert").append(
+                '<div class="spinner-border m-3" role="status"></div>'
+            );
+            var today = new Date();
+            var year = today.getFullYear();
+            var month = today.getMonth() + 1;
+            var day = today.getDate();
+            $("#date").html('Today : ' + year + '/' + month + '/' + day);
+            url_players = "https://rxz2mtviuc3hd5oiz7bmnrjjie0wfqfz.lambda-url.ap-northeast-1.on.aws/"
+            $.ajax({ url: url_players }).done(function (data) {
+                var str = "";
+                console.log(data);
+                for (var id in data) {
+                    str = str + '<option value="' + id + '">' + data[id] + '</option>'
+                }
+                $("#alert").empty();
+                $("#1st-player, #2nd-player, #3rd-player, #4th-player").append(str);
+            }).fail(function () {
+                $("#alert").empty();
+                $("#alert").append('<p>予期しないエラーです。管理者に連絡してください。</p>');
+            });
+        });
+
+        function send() {
+            $("#alert").empty();
+            $("#alert").append(
+                '<div class="spinner-border m-3" role="status"></div>'
+            );
+            var numlist = Array.from(Array(9999).keys()).map((n) => n-5000 );
+            var player1st = parseInt($("#1st-player").val());
+            var player2nd = parseInt($("#2nd-player").val());
+            var player3rd = parseInt($("#3rd-player").val());
+            var player4th = parseInt($("#4th-player").val());
+            var score1st = parseInt($("#1st-score").val());
+            var score2nd = parseInt($("#2nd-score").val());
+            var score3rd = parseInt($("#3rd-score").val());
+            var score4th = parseInt($("#4th-score").val());
+
+            if (
+                $.inArray(player1st, numlist) == -1 ||
+                $.inArray(player2nd, numlist) == -1 ||
+                $.inArray(player3rd, numlist) == -1 ||
+                $.inArray(player4th, numlist) == -1 ||
+                player1st == player2nd ||
+                player1st == player3rd ||
+                player1st == player4th ||
+                player2nd == player3rd ||
+                player2nd == player4th ||
+                player3rd == player4th ||
+                $.inArray(score1st, numlist) == -1 ||
+                $.inArray(score2nd, numlist) == -1 ||
+                $.inArray(score3rd, numlist) == -1 ||
+                $.inArray(score4th, numlist) == -1 ||
+                score1st<=score2nd ||
+                score2nd<=score3rd ||
+                score3rd<=score4th ||
+                score1st + score2nd + score3rd + score4th != 0
+            ) {
+                $("#alert").empty();
+                $("#alert").append('<p>エラー。入力を確認してください。問題が解決しない場合は管理者へ連絡してください。</p>');
+                console.log("err");
+                return 0;
+            }
+            var url = "https://wmhzmcm5ieenlcaw25zpzoqpvm0dfqbb.lambda-url.ap-northeast-1.on.aws/"
+            $.ajax({
+                url: url,
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'player1st': player1st,
+                    'player2nd': player2nd,
+                    'player3rd': player3rd,
+                    'player4th': player4th,
+                    'score1st': score1st,
+                    'score2nd': score2nd,
+                    'score3rd': score3rd,
+                    'score4th': score4th
+                }
+            }).done(function (data) {
+                $("#alert").empty();
+                $("#alert").append('<p>疎通成功</p>');
+                if (data) {
+                    $("#alert").append('<p>登録成功</p>');
+                    return 0;
+                } else {
+                    $("#alert").append('<p>予期しないエラーです。管理者に連絡してください。input</p>');
+                }
+
+            }).fail(function () {
+                $("#alert").empty();
+                $("#alert").append('<p>予期しないエラーです。管理者に連絡してください。</p>');
+
+            });
+
+        }
+    </script>
+</head>
+
+<body>
+    <div class="m-3">
+        <nav class="nav nav-underline nav-fill my-4">
+            <a class="nav-link" href="./index.html">ホーム</a>
+            <a class="nav-link active" aria-current="page" href="./inputResult.html">戦績入力</a>
+            <a class="nav-link" href="./viewResult.html">戦績照会</a>
+            <a class="nav-link" href="./registerPlayer.html">雀士登録</a>
+        </nav>
+        <h1>戦績入力</h1>
+        <div id="alert" class="m-auto"></div>
+        <div class="m-3">
+            <p id="date"></p>
+        </div>
+    </div>
+
+
+
+    <div class="m-3 text-center">
+        <div class="badge" style="background-color: #219c90; width: 90%; ">
+            １位
+        </div>
+        <div class="row">
+            <div class="col">
+                <select class="form-select" id="1st-player">
+                    <option selected>プレーヤー選択</option>
+                </select>
+            </div>
+            <div class="col">
+                <input class="form-control" id="1st-score" placeholder="スコア">
+            </div>
+        </div>
+    </div>
+    <div class="m-3 text-center">
+        <div class="badge" style="background-color: #e9b824; width: 90%; ">
+            ２位
+        </div>
+        <div class="row">
+            <div class="col">
+                <select class="form-select" id="2nd-player">
+                    <option selected>プレーヤー選択</option>
+                </select>
+            </div>
+            <div class="col">
+                <input class="form-control" id="2nd-score" placeholder="スコア">
+            </div>
+        </div>
+    </div>
+    <div class="m-3 text-center">
+        <div class="badge" style="background-color: #ee9322; width: 90%; ">
+            ３位
+        </div>
+        <div class="row">
+            <div class="col">
+                <select class="form-select" id="3rd-player">
+                    <option selected>プレーヤー選択</option>
+                </select>
+            </div>
+            <div class="col">
+                <input class="form-control" id="3rd-score" placeholder="スコア">
+            </div>
+        </div>
+    </div>
+    <div class="m-3 text-center">
+        <div class="badge" style="background-color: #d83f31; width: 90%; ">
+            ４位
+        </div>
+        <div class="row">
+            <div class="col">
+                <select class="form-select" id="4th-player">
+                    <option selected>プレーヤー選択</option>
+                </select>
+            </div>
+            <div class="col">
+                <input class="form-control" id="4th-score" placeholder="スコア">
+            </div>
+        </div>
+    </div>
+
+    <div class="m-3 text-center">
+        <button class="btn btn-primary" onclick="send()">送信</button>
+    </div>
+
+</body>
+
+</html>

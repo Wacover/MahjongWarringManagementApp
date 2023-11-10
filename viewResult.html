@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+
+<head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>麻雀成績簿</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+
+    <script>
+        $(function () {
+            
+            $("#spinner").append(
+                '<div class="spinner-border m-3" role="status"></div>'
+            );
+            var url_cons = "https://mtfhgej6ogdeehbbnpblpzfdbq0bkrvi.lambda-url.ap-northeast-1.on.aws/"
+            $.ajax({ url: url_cons }).done(function (data_cons) {
+                if (data_cons) {
+                    var url = "https://idbx3psc6c36qbwbrearmdmxgy0kbsvl.lambda-url.ap-northeast-1.on.aws/"
+                    $.ajax({ url: url }).done(function (data) {
+                        console.log(data);
+                        for (var i = 0; i < Object.keys(data).length; i++) {
+                            var appendstr = '<tr> <th scope="row">' + data[i]['name']['S'] + '</th> <td>' + data[i]['result']['M']['total']['N'] + '</td> <td>' + data[i]['result']['M']['games']['N'] + '本</td> <td>' + data[i]['result']['M']['rank']['M']['1st']['N'] + '</td> <td>' + data[i]['result']['M']['rank']['M']['2nd']['N'] + '</td> <td>' + data[i]['result']['M']['rank']['M']['3rd']['N'] + '</td> <td>' + data[i]['result']['M']['rank']['M']['4th']['N'] + '</td> <td>' + data[i]['result']['M']['avg']['N'] + '</td> </tr>';
+                            $("#spinner").empty();
+                            $("#result_tbody").append(appendstr);
+                        }
+                    }).fail(function () {
+                        $("#spinner").empty();
+                        console.log("err");
+                        $("#alert").append('<p>予期しないエラーです。管理者に連絡してください。view</p>');
+                    });
+                } else {
+                    $("#spinner").empty();
+                    $("#alert").append('<p>データベースエラーです。管理者に連絡してください。</p>');
+                }
+            }).fail(function(){
+                $("#spinner").empty();
+                console.log("err");
+                $("#alert").append('<p>予期しないエラーです。管理者に連絡してください。isconsistent</p>');
+
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div class="m-3">
+        <div id="navber"></div>
+        <nav class="nav nav-underline nav-fill my-4">
+            <a class="nav-link" href="./index.html">ホーム</a>
+            <a class="nav-link" href="./inputResult.html">戦績入力</a>
+            <a class="nav-link active" href="./viewResult.html">戦績照会</a>
+            <a class="nav-link" href="./registerPlayer.html">雀士登録</a>
+        </nav>
+        <h1>戦績照会</h1>
+        <div id="spinner" class="m-auto"></div>
+        <div style="overflow: scroll;">
+            <table class="table table-striped" style="width: 100%;white-space: nowrap;">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Score</th>
+                        <th scope="col">Games</th>
+                        <th scope="col">1.</th>
+                        <th scope="col">2.</th>
+                        <th scope="col">3.</th>
+                        <th scope="col">4.</th>
+                        <th scope="col">avg.</th>
+                    </tr>
+                </thead>
+                <tbody id="result_tbody">
+                </tbody>
+            </table>
+        </div>
+        <div id="alert"></div>
+
+    </div>
+</body>
+
+</html>
